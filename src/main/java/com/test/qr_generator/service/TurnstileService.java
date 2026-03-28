@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -20,6 +21,9 @@ public class TurnstileService {
     // Barcode format with seconds (e.g., "2026-03-24T09:44:00")
     private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final DateTimeFormatter ISO_DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    
+    // Timezone for time comparison - matching user timezone
+    private static final ZoneId ZONE_ID = ZoneId.of("Asia/Dhaka");
 
     /**
      * Processes barcode data and determines if the turnstile gate should open
@@ -54,7 +58,7 @@ public class TurnstileService {
                 return response;
             }
 
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZONE_ID);
             LocalDate today = now.toLocalDate();
             LocalDate scannedDate = scannedDateTime.toLocalDate();
             
@@ -182,7 +186,7 @@ public class TurnstileService {
         // Try parsing just date and use current time
         try {
             LocalDate date = LocalDate.parse(data, DATE_FORMAT);
-            return LocalDateTime.of(date, LocalTime.now());
+            return LocalDateTime.of(date, LocalTime.now(ZONE_ID));
         } catch (Exception e) {
             return null;
         }
@@ -193,7 +197,7 @@ public class TurnstileService {
      * @return A valid barcode string with today's date and current time
      */
     public String generateSampleBarcode() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZONE_ID);
         return now.format(DATE_FORMAT) + ":" + now.format(TIME_FORMAT);
     }
 
@@ -203,7 +207,7 @@ public class TurnstileService {
      * @return A barcode string with future time
      */
     public String generateFutureBarcode(int minutesAhead) {
-        LocalDateTime future = LocalDateTime.now().plusMinutes(minutesAhead);
+        LocalDateTime future = LocalDateTime.now(ZONE_ID).plusMinutes(minutesAhead);
         return future.format(DATE_FORMAT) + ":" + future.format(TIME_FORMAT);
     }
 
@@ -213,7 +217,7 @@ public class TurnstileService {
      * @return A barcode string with past time
      */
     public String generatePastBarcode(int minutesAgo) {
-        LocalDateTime past = LocalDateTime.now().minusMinutes(minutesAgo);
+        LocalDateTime past = LocalDateTime.now(ZONE_ID).minusMinutes(minutesAgo);
         return past.format(DATE_FORMAT) + ":" + past.format(TIME_FORMAT);
     }
 }
