@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnstile Gate Simulation</title>
+    <script src="https://unpkg.com/@zxing/library@0.20.0"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .gate-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            margin: 20px 0;
+            background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-radius: 10px;
+            border: 3px solid #ccc;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gate-frame {
+            width: 200px;
+            height: 280px;
+            border: 8px solid #444;
+            border-radius: 10px;
+            position: relative;
+            background: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gate-door {
+            width: 80px;
+            height: 240px;
+            background: linear-gradient(90deg, #666 0%, #888 50%, #666 100%);
+            border-radius: 5px;
+            position: absolute;
+            transition: transform 0.5s ease-in-out;
+            transform-origin: left center;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .gate-door.open {
+            transform: rotateY(-80deg);
+        }
+
+        .gate-status {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .status-light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+
+        .status-light.red {
+            background: #ff4444;
+            box-shadow: 0 0 10px #ff4444;
+        }
+
+        .status-light.green {
+            background: #44ff44;
+            box-shadow: 0 0 10px #44ff44;
+        }
+
+        .status-light.gray {
+            background: #888;
+        }
+
+        .gate-message {
+            position: absolute;
+            top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            background: #f8f9fa;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-box.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .result-box.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        .result-box.info {
+            background: #cce5ff;
+            border: 2px solid #004085;
+            color: #004085;
+        }
+
+        .result-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .result-box p {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .result-box .highlight {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .scanner-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .scanner-container.active {
+            display: block;
+        }
+
+        #video-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #667eea;
+        }
+
+        #video-container video {
+            width: 100%;
+            display: block;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .time-display {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .time-display span {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .format-hint {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .scanned-data {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .scanning {
+            animation: pulse 1s infinite;
+        }
+
+        .upload-section {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .upload-section:hover {
+            border-color: #667eea;
+        }
+
+        #preview-container {
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #preview-container img {
+            max-width: 200px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚪 Turnstile Gate Simulation</h1>
+        <p class="subtitle">Scan barcode to control access</p>
+
+        <div class="card">
+            <h2>⏰ Current System Time</h2>
+            <div class="time-display">
+                Current Time: <span id="current-time">--:--</span><br>
+                Current Date: <span id="current-date">----/--/--</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎫 Gate Access Control</h2>
+            
+            <div class="gate-visual">
+                <div class="gate-frame">
+                    <div class="gate-door" id="gate-door"></div>
+                    <div class="gate-message" id="gate-message">SCAN TICKET</div>
+                    <div class="gate-status">
+                        <div class="status-light red" id="red-light"></div>
+                        <div class="status-light green" id="green-light"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="upload-section">
+                <h3>📤 Upload Barcode Image</h3>
+                <p style="color:#666; margin-bottom:15px;">Upload a barcode image containing date/time (e.g., 2024-11-23T18:30:00Z)</p>
+                <input type="file" id="barcode-file" accept="image/*" onchange="previewImage()">
+                <div id="preview-container">
+                    <img id="preview-image" alt="Barcode preview">
+                </div>
+                <div style="margin-top:15px;">
+                    <button class="btn btn-primary" onclick="scanAndValidate()">🔍 Scan & Validate</button>
+                    <button class="btn btn-secondary" onclick="clearUpload()">🗑️ Clear</button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+                <label for="barcode-input">Or Enter Barcode Data Manually</label>
+                <input type="text" id="barcode-input" placeholder="e.g., 2024-11-23T18:30:00Z or 2024-11-23:18:30">
+                <p class="format-hint">Format: YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DD:HH:MM</p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="validateBarcode()">🔓 Validate</button>
+                <button class="btn btn-secondary" onclick="clearForm()">🗑️ Clear</button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-success" onclick="getSampleBarcode('valid')">✅ Valid Now</button>
+                <button class="btn btn-warning" onclick="getSampleBarcode('future')">⏳ Future (30min)</button>
+                <button class="btn btn-danger" onclick="getSampleBarcode('past')">❌ Expired (30min)</button>
+                <button class="btn btn-secondary" onclick="getSampleBarcode('expired_date')">📅 Expired Date</button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-info" onclick="startScanner()">📷 Scan with Camera</button>
+                <button class="btn btn-secondary" onclick="stopScanner()" id="stop-scan-btn" style="display:none;">⏹️ Stop Scanner</button>
+            </div>
+
+            <div class="scanner-container" id="scanner-container">
+                <div id="video-container">
+                    <video id="video"></video>
+                </div>
+                <p style="text-align:center; margin-top:10px; color:#666;">Position barcode in camera view</p>
+            </div>
+
+            <div class="result-box" id="result-box">
+                <h3 id="result-title"></h3>
+                <p id="result-message"></p>
+                <div id="scanned-data-display" class="scanned-data" style="display:none;"></div>
+                <p id="result-details"></p>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">🏠 Home</a>
+            <a href="/reader">📱 QR Reader</a>
+        </div>
+    </div>
+
+    <script>
+        let codeReader = null;
+        let videoStream = null;
+
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('current-date').textContent = `${year}-${month}-${day}`;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Preview uploaded image
+        function previewImage() {
+            const fileInput = document.getElementById('barcode-file');
+            const previewContainer = document.getElementById('preview-container');
+            const previewImage = document.getElementById('preview-image');
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        // Clear upload
+        function clearUpload() {
+            resetFileInput();
+        }
+
+        // Scan and validate from file upload
+        async function scanAndValidate() {
+            const fileInput = document.getElementById('barcode-file');
+            
+            if (!fileInput.files || !fileInput.files[0]) {
+                showResult('error', 'Please select a barcode image to upload');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                showResult('info', 'Scanning barcode...');
+                
+                const response = await fetch('/api/qr/turnstile/scan', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                showResult('error', 'Error scanning barcode: ' + error.message);
+            }
+        }
+        
+        // Reset file input to allow re-scanning the same file
+        function resetFileInput() {
+            const fileInput = document.getElementById('barcode-file');
+            fileInput.value = '';
+            // Create a new file input element to replace the old one
+            const newFileInput = fileInput.cloneNode(false);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+            document.getElementById('preview-container').style.display = 'none';
+            document.getElementById('preview-image').src = '';
+        }
+
+        // Validate barcode
+        async function validateBarcode() {
+            const barcode = document.getElementById('barcode-input').value.trim();
+            
+            if (!barcode) {
+                showResult('error', 'Please enter barcode data');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/qr/turnstile/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ barcode: barcode })
+                });
+
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                showResult('error', 'Error: ' + error.message);
+            }
+        }
+
+        // Display result
+        function displayResult(result) {
+            const resultBox = document.getElementById('result-box');
+            const resultTitle = document.getElementById('result-title');
+            const resultMessage = document.getElementById('result-message');
+            const resultDetails = document.getElementById('result-details');
+            const scannedDataDisplay = document.getElementById('scanned-data-display');
+            const gateDoor = document.getElementById('gate-door');
+            const gateMessage = document.getElementById('gate-message');
+            const redLight = document.getElementById('red-light');
+            const greenLight = document.getElementById('green-light');
+
+            resultBox.style.display = 'block';
+            
+            // Show scanned data if available
+            if (result.scannedDate) {
+                scannedDataDisplay.style.display = 'block';
+                scannedDataDisplay.innerHTML = `<strong>Scanned Data:</strong> ${result.scannedDate} ${result.scannedTime}`;
+            } else {
+                scannedDataDisplay.style.display = 'none';
+            }
+            
+            if (result.gateOpen) {
+                // Gate opens
+                resultBox.className = 'result-box success';
+                resultTitle.textContent = '✓ ACCESS GRANTED';
+                resultMessage.textContent = result.message;
+                resultDetails.innerHTML = `
+                    <strong>Scanned Date:</strong> ${result.scannedDate || 'N/A'}<br>
+                    <strong>Scanned Time:</strong> ${result.scannedTime || 'N/A'}<br>
+                    <strong>Current Time:</strong> ${result.currentTime}<br>
+                    <strong>Time Difference:</strong> ${Math.abs(result.timeDiffMinutes)} minutes
+                `;
+                
+                // Visual feedback
+                gateDoor.classList.add('open');
+                gateMessage.textContent = 'OPEN';
+                gateMessage.style.color = '#28a745';
+                redLight.classList.remove('red');
+                redLight.classList.add('gray');
+                greenLight.classList.remove('gray');
+                greenLight.classList.add('green');
+            } else {
+                // Gate stays closed
+                resultBox.className = result.success ? 'result-box error' : 'result-box info';
+                resultTitle.textContent = result.gateOpen ? '✓ ACCESS GRANTED' : '✗ ACCESS DENIED';
+                resultMessage.textContent = result.message;
+                
+                let details = '';
+                if (result.scannedDate) {
+                    details += `<strong>Scanned Date:</strong> ${result.scannedDate}<br>`;
+                }
+                if (result.scannedTime) {
+                    details += `<strong>Scanned Time:</strong> ${result.scannedTime}<br>`;
+                }
+                if (result.currentTime) {
+                    details += `<strong>Current Time:</strong> ${result.currentTime}<br>`;
+                }
+                if (result.timeDiffMinutes !== undefined) {
+                    details += `<strong>Time Difference:</strong> ${Math.abs(result.timeDiffMinutes)} minutes<br>`;
+                }
+                details += '<br><strong>Rule:</strong> Gate opens only if date is today AND time is within 1 hour from now';
+                
+                resultDetails.innerHTML = details;
+                
+                // Visual feedback
+                gateDoor.classList.remove('open');
+                gateMessage.textContent = 'CLOSED';
+                gateMessage.style.color = '#dc3545';
+                greenLight.classList.remove('green');
+                greenLight.classList.add('gray');
+                redLight.classList.remove('gray');
+                redLight.classList.add('red');
+            }
+        }
+
+        // Show simple result
+        function showResult(type, message) {
+            const resultBox = document.getElementById('result-box');
+            const resultTitle = document.getElementById('result-title');
+            const resultMessage = document.getElementById('result-message');
+            const resultDetails = document.getElementById('result-details');
+            const scannedDataDisplay = document.getElementById('scanned-data-display');
+
+            resultBox.style.display = 'block';
+            resultBox.className = 'result-box ' + type;
+            resultTitle.textContent = type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Info';
+            resultMessage.textContent = message;
+            resultDetails.innerHTML = '';
+            scannedDataDisplay.style.display = 'none';
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('barcode-input').value = '';
+            document.getElementById('result-box').style.display = 'none';
+            clearUpload();
+            
+            // Reset gate
+            const gateDoor = document.getElementById('gate-door');
+            const gateMessage = document.getElementById('gate-message');
+            const redLight = document.getElementById('red-light');
+            const greenLight = document.getElementById('green-light');
+            
+            gateDoor.classList.remove('open');
+            gateMessage.textContent = 'SCAN TICKET';
+            gateMessage.style.color = '#333';
+            greenLight.classList.remove('green');
+            greenLight.classList.add('gray');
+            redLight.classList.remove('red');
+            redLight.classList.add('gray');
+        }
+
+        // Get sample barcode
+        async function getSampleBarcode(type) {
+            try {
+                const response = await fetch(`/api/qr/turnstile/sample?type=${type}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('barcode-input').value = result.barcode;
+                    showResult('info', `Sample: ${result.description}`);
+                }
+            } catch (error) {
+                showResult('error', 'Error getting sample: ' + error.message);
+            }
+        }
+
+        // Start barcode scanner
+        async function startScanner() {
+            const scannerContainer = document.getElementById('scanner-container');
+            const stopBtn = document.getElementById('stop-scan-btn');
+            
+            try {
+                codeReader = new ZXing.BrowserMultiFormatReader();
+                scannerContainer.classList.add('active');
+                stopBtn.style.display = 'inline-block';
+
+                const videoElement = document.getElementById('video');
+                
+                codeReader.decodeFromVideoDevice(undefined, videoElement, (result, error) => {
+                    if (result) {
+                        const barcodeData = result.getText();
+                        document.getElementById('barcode-input').value = barcodeData;
+                        stopScanner();
+                        validateBarcode();
+                    }
+                    if (error) {
+                        // Ignore errors during scanning
+                    }
+                });
+            } catch (error) {
+                showResult('error', 'Error starting scanner: ' + error.message);
+            }
+        }
+
+        // Stop barcode scanner
+        function stopScanner() {
+            const scannerContainer = document.getElementById('scanner-container');
+            const stopBtn = document.getElementById('stop-scan-btn');
+            
+            if (codeReader) {
+                codeReader.reset();
+            }
+            
+            // Stop video stream
+            const videoElement = document.getElementById('video');
+            if (videoElement.srcObject) {
+                const tracks = videoElement.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+            
+            scannerContainer.classList.remove('active');
+            stopBtn.style.display = 'none';
+        }
+
+        // Handle Enter key
+        document.getElementById('barcode-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateBarcode();
+            }
+        });
+    </script>
+</body>
+</html>
