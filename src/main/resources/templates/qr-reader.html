@@ -3,113 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code & Barcode Reader</title>
+    <title>Combined Military Hospital Dhaka - QR Reader</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://unpkg.com/@zxing/library@0.20.0"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .card {
+        
+        .bg-card {
             background: white;
             border-radius: 15px;
-            padding: 30px;
+            padding: 25px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-
-        .card h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-
-        .tab-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #f0f0f0;
-            color: #666;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .type-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .type-option {
-            flex: 1;
-            min-width: 120px;
-            padding: 10px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .type-option:hover {
-            border-color: #667eea;
-        }
-
-        .type-option.selected {
-            border-color: #667eea;
-            background: #f0f4ff;
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .type-option input {
-            display: none;
-        }
-
+        
         .upload-area {
             border: 2px dashed #ccc;
             border-radius: 10px;
@@ -118,27 +30,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
+        
         .upload-area:hover {
             border-color: #667eea;
             background: #f9f9ff;
         }
-
-        .upload-area input {
-            display: none;
-        }
-
-        .upload-icon {
-            font-size: 4rem;
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .upload-text {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
+        
         .preview-image {
             max-width: 100%;
             max-height: 300px;
@@ -146,30 +43,7 @@
             border-radius: 10px;
             display: none;
         }
-
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
+        
         #webcam-container {
             width: 100%;
             max-width: 500px;
@@ -178,192 +52,159 @@
             overflow: hidden;
             background: #000;
         }
-
+        
         #webcam-video {
             width: 100%;
             display: block;
         }
-
-        #scan-result {
-            margin-top: 20px;
+        
+        .result-box {
             padding: 15px;
             border-radius: 8px;
+            margin-top: 20px;
             display: none;
         }
-
-        #scan-result.success {
+        
+        .result-box.success {
             background: #d4edda;
             border: 1px solid #c3e6cb;
             color: #155724;
         }
-
-        #scan-result.error {
+        
+        .result-box.error {
             background: #f8d7da;
             border: 1px solid #f5c6cb;
             color: #721c24;
         }
-
-        .result-content {
-            font-size: 1.2rem;
-            font-weight: bold;
-            word-break: break-all;
-        }
-
-        .result-format {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .history-list {
-            list-style: none;
-        }
-
+        
         .history-item {
             padding: 15px;
             border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-
+        
         .history-item:last-child {
             border-bottom: none;
         }
-
+        
         .history-content {
-            flex: 1;
             word-break: break-all;
-            color: #333;
         }
-
+        
         .history-format {
             font-size: 0.8rem;
             color: #667eea;
             background: #f0f4ff;
             padding: 2px 8px;
             border-radius: 4px;
-            margin-left: 10px;
         }
-
-        .history-time {
-            color: #999;
-            font-size: 0.85rem;
-            margin-left: 15px;
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .supported-formats {
-            margin-top: 15px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .supported-formats strong {
-            color: #333;
+        
+        .scanning {
+            animation: pulse 1s infinite;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>QR Code & Barcode Reader</h1>
+        <h1 class="text-center text-white mb-4"><i class="bi bi-hospital me-2"></i>Combined Military Hospital Dhaka</h1>
+        <p class="text-center text-white-50 mb-4">QR Code Reader</p>
 
-        <div class="card">
-            <div class="tab-container">
-                <button class="tab-btn active" onclick="showTab('upload')">Upload Image</button>
-                <button class="tab-btn" onclick="showTab('webcam')">Webcam Scanner</button>
-            </div>
+        <div class="bg-card">
+            <!-- Tabs -->
+            <ul class="nav nav-pills mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#upload-tab" type="button">
+                        📁 Upload Image
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#webcam-tab" type="button">
+                        📷 Webcam Scanner
+                    </button>
+                </li>
+            </ul>
 
-            <div id="scan-result"></div>
+            <!-- Result Display -->
+            <div id="scan-result" class="result-box"></div>
 
             <!-- Upload Tab -->
-            <div id="upload-tab" class="tab-content active">
-                <div class="type-selector">
-                    <label class="type-option selected" id="type-qr">
-                        <input type="radio" name="scanType" value="qr" checked>
-                        QR Code
-                    </label>
-                    <label class="type-option" id="type-barcode">
-                        <input type="radio" name="scanType" value="barcode">
-                        Barcode
-                    </label>
-                    <label class="type-option" id="type-auto">
-                        <input type="radio" name="scanType" value="auto">
-                        Auto Detect
-                    </label>
+            <div class="tab-pane fade show active" id="upload-tab">
+                <!-- Type Selector -->
+                <div class="btn-group mb-4" role="group">
+                    <input type="radio" class="btn-check" name="scanType" id="type-qr" value="qr" checked>
+                    <label class="btn btn-outline-primary" for="type-qr">QR Code</label>
+                    
+                    <input type="radio" class="btn-check" name="scanType" id="type-barcode" value="barcode">
+                    <label class="btn btn-outline-primary" for="type-barcode">Barcode</label>
+                    
+                    <input type="radio" class="btn-check" name="scanType" id="type-auto" value="auto">
+                    <label class="btn btn-outline-primary" for="type-auto">Auto Detect</label>
                 </div>
                 
+                <!-- Upload Area -->
                 <div class="upload-area" onclick="document.getElementById('file-input').click()">
-                    <div class="upload-icon">📁</div>
-                    <div class="upload-text">Click to upload QR code or barcode image</div>
-                    <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+                    <div class="mb-3" style="font-size: 3rem;">📁</div>
+                    <p class="text-muted mb-0">Click to upload QR code or barcode image</p>
+                    <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)" hidden>
                 </div>
-                <img id="preview-image" class="preview-image" alt="Preview">
-                <div style="text-align: center;">
-                    <button class="btn" id="read-btn" onclick="readCodeFromFile()" disabled>Read Code</button>
+                <img id="preview-image" class="preview-image mx-auto d-block" alt="Preview">
+                
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary btn-lg" id="read-btn" onclick="readCodeFromFile()" disabled>
+                        Read Code
+                    </button>
                 </div>
-                <div class="supported-formats">
-                    <strong>Supported Barcode Formats:</strong> Code 128, Code 39, Code 93, Codabar, EAN-13, EAN-8, ITF, UPC-A, UPC-E
+                
+                <div class="mt-3 p-3 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Supported Barcodes:</strong> Code 128, Code 39, Code 93, Codabar, EAN-13, EAN-8, ITF, UPC-A, UPC-E
+                    </small>
                 </div>
             </div>
 
             <!-- Webcam Tab -->
-            <div id="webcam-tab" class="tab-content">
-                <div class="type-selector">
-                    <label class="type-option selected" id="webcam-type-qr">
-                        <input type="radio" name="webcamScanType" value="qr" checked>
-                        QR Code
-                    </label>
-                    <label class="type-option" id="webcam-type-barcode">
-                        <input type="radio" name="webcamScanType" value="barcode">
-                        Barcode
-                    </label>
-                    <label class="type-option" id="webcam-type-auto">
-                        <input type="radio" name="webcamScanType" value="auto">
-                        Auto Detect
-                    </label>
+            <div class="tab-pane fade" id="webcam-tab">
+                <!-- Type Selector -->
+                <div class="btn-group mb-4" role="group">
+                    <input type="radio" class="btn-check" name="webcamScanType" id="webcam-type-qr" value="qr" checked>
+                    <label class="btn btn-outline-primary" for="webcam-type-qr">QR Code</label>
+                    
+                    <input type="radio" class="btn-check" name="webcamScanType" id="webcam-type-barcode" value="barcode">
+                    <label class="btn btn-outline-primary" for="webcam-type-barcode">Barcode</label>
+                    
+                    <input type="radio" class="btn-check" name="webcamScanType" id="webcam-type-auto" value="auto">
+                    <label class="btn btn-outline-primary" for="webcam-type-auto">Auto Detect</label>
                 </div>
+                
                 <div id="webcam-container">
                     <video id="webcam-video" autoplay playsinline></video>
                 </div>
-                <div style="text-align: center; margin-top: 15px;">
-                    <button class="btn" id="start-webcam" onclick="startWebcam()">Start Webcam</button>
-                    <button class="btn" id="stop-webcam" onclick="stopWebcam()" style="display: none;">Stop Webcam</button>
+                
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary" id="start-webcam" onclick="startWebcam()">
+                        ▶️ Start Webcam
+                    </button>
+                    <button class="btn btn-danger" id="stop-webcam" onclick="stopWebcam()" style="display: none;">
+                        ⏹️ Stop Webcam
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <!-- History Card -->
-            <div class="card">
-                <h2>Recent Scans</h2>
+        <!-- History Card -->
+        <div class="bg-card">
+            <h5 class="border-bottom pb-2 mb-3">📋 Recent Scans</h5>
             <div id="history-container">
-                <div class="loading">Loading history...</div>
+                <p class="text-muted text-center">Loading history...</p>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let selectedFile = null;
         let codeReader = null;
@@ -371,20 +212,15 @@
         let scanInterval = null;
         let scanHistory = [];
 
-        // Type selector click handling
-        document.querySelectorAll('.type-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const parent = this.closest('.type-selector');
-                parent.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
-                this.classList.add('selected');
-                this.querySelector('input').checked = true;
-            });
-        });
-
         // Get selected scan type
-        function getSelectedScanType(prefix = '') {
-            const name = prefix + 'scanType';
-            const selected = document.querySelector(`input[name="${name}"]:checked`);
+        function getSelectedScanType() {
+            const selected = document.querySelector('input[name="scanType"]:checked');
+            return selected ? selected.value : 'auto';
+        }
+
+        // Get selected webcam scan type
+        function getSelectedWebcamScanType() {
+            const selected = document.querySelector('input[name="webcamScanType"]:checked');
             return selected ? selected.value : 'auto';
         }
 
@@ -400,20 +236,6 @@
 
         initCodeReader();
 
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            if (tabName === 'upload') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('upload-tab').classList.add('active');
-                stopWebcam();
-            } else {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('webcam-tab').classList.add('active');
-            }
-        }
-
         function handleFileSelect(event) {
             selectedFile = event.target.files[0];
             if (selectedFile) {
@@ -423,18 +245,8 @@
                     preview.src = e.target.result;
                     preview.style.display = 'block';
                     document.getElementById('read-btn').disabled = false;
-                    document.getElementById('read-btn').textContent = 'Read ' + getScanTypeLabel(getSelectedScanType(''));
                 };
                 reader.readAsDataURL(selectedFile);
-            }
-        }
-
-        function getScanTypeLabel(type) {
-            switch(type) {
-                case 'qr': return 'QR Code';
-                case 'barcode': return 'Barcode';
-                case 'auto': return 'Code';
-                default: return 'Code';
             }
         }
 
@@ -471,11 +283,11 @@
         async function readCodeFromFile() {
             if (!selectedFile) return;
 
-            const scanType = getSelectedScanType('');
+            const scanType = getSelectedScanType();
             const resultDiv = document.getElementById('scan-result');
             resultDiv.style.display = 'block';
-            resultDiv.className = '';
-            resultDiv.innerHTML = `<div class="loading"><div class="spinner"></div><p>Reading ${getScanTypeLabel(scanType)}...</p></div>`;
+            resultDiv.className = 'result-box';
+            resultDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
 
             // First try with ZXing client-side
             if (codeReader) {
@@ -498,16 +310,20 @@
             // Fallback to server-side reading
             const formData = new FormData();
             formData.append('file', selectedFile);
-
-            let endpoint = '/api/qr/read-any';
-            if (scanType === 'qr') endpoint = '/api/qr/read';
-            else if (scanType === 'barcode') endpoint = '/api/qr/read-barcode';
+            
+            let endpoint = '/api/qr/read';
+            if (scanType === 'barcode') {
+                endpoint = '/api/qr/read-barcode';
+            } else if (scanType === 'auto') {
+                endpoint = '/api/qr/read-any';
+            }
 
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     body: formData
                 });
+                
                 const data = await response.json();
                 
                 if (data.success) {
@@ -517,24 +333,44 @@
                     showResult(false, data.message);
                 }
             } catch (error) {
-                showResult(false, 'Error: ' + error.message);
+                showResult(false, 'Error reading code: ' + error.message);
             }
         }
 
+        function showResult(success, content, format = null) {
+            const resultDiv = document.getElementById('scan-result');
+            resultDiv.style.display = 'block';
+            
+            if (success) {
+                resultDiv.className = 'result-box success';
+                resultDiv.innerHTML = `
+                    <h5 class="mb-2">✅ Code Read Successfully!</h5>
+                    <p class="mb-1"><strong>Content:</strong> ${content}</p>
+                    ${format ? `<span class="badge bg-primary">${format}</span>` : ''}
+                `;
+            } else {
+                resultDiv.className = 'result-box error';
+                resultDiv.innerHTML = `
+                    <h5 class="mb-2">❌ Error</h5>
+                    <p class="mb-0">${content}</p>
+                `;
+            }
+        }
+
+        // Webcam functions
         async function startWebcam() {
             try {
+                const video = document.getElementById('webcam-video');
                 webcamStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: 'environment' } 
                 });
-                
-                const video = document.getElementById('webcam-video');
                 video.srcObject = webcamStream;
                 
                 document.getElementById('start-webcam').style.display = 'none';
                 document.getElementById('stop-webcam').style.display = 'inline-block';
-
-                // Start continuous scanning
-                scanWithWebcam();
+                
+                // Start scanning
+                startContinuousScan();
             } catch (err) {
                 alert('Error accessing webcam: ' + err.message);
             }
@@ -543,112 +379,99 @@
         function stopWebcam() {
             if (webcamStream) {
                 webcamStream.getTracks().forEach(track => track.stop());
-                webcamStream = null;
             }
-            
             if (scanInterval) {
                 clearInterval(scanInterval);
-                scanInterval = null;
             }
-
+            
+            document.getElementById('webcam-video').srcObject = null;
             document.getElementById('start-webcam').style.display = 'inline-block';
             document.getElementById('stop-webcam').style.display = 'none';
         }
 
-        async function scanWithWebcam() {
-            if (!codeReader || !webcamStream) return;
-
-            const scanType = getSelectedScanType('webcam');
+        async function startContinuousScan() {
+            if (!codeReader) {
+                codeReader = new ZXing.BrowserMultiFormatReader();
+            }
+            
             const video = document.getElementById('webcam-video');
+            const scanType = getSelectedWebcamScanType();
             
             scanInterval = setInterval(async () => {
-                if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                    try {
-                        const hints = new Map();
-                        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, getFormatsForType(scanType));
+                try {
+                    const hints = new Map();
+                    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, getFormatsForType(scanType));
+                    
+                    const result = await codeReader.decodeFromVideoElement(video, hints);
+                    if (result) {
+                        console.log('Scanned:', result.getText());
+                        showResult(true, result.getText(), result.getBarcodeFormat().name);
+                        saveToHistory(result.getText(), result.getBarcodeFormat().name);
                         
-                        const result = await codeReader.decodeFromVideoElement(video, hints);
-                        if (result) {
-                            showResult(true, result.getText(), result.getBarcodeFormat().name);
-                            saveToHistory(result.getText(), result.getBarcodeFormat().name);
-                            stopWebcam();
-                        }
-                    } catch (err) {
-                        // Silent fail for continuous scanning
+                        // Pause scanning briefly
+                        clearInterval(scanInterval);
+                        setTimeout(() => startContinuousScan(), 2000);
                     }
+                } catch (err) {
+                    // Ignore scanning errors
                 }
-            }, 200);
+            }, 500);
         }
 
-        function showResult(success, message, format = null) {
-            const resultDiv = document.getElementById('scan-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = success ? 'success' : 'error';
-            
-            let html = '';
-            if (success) {
-                const formatLabel = format ? format.replace('_', ' ') : 'CODE';
-                html = `<p>Found:</p><div class="result-content">${escapeHtml(message)}</div><div class="result-format">Format: ${formatLabel}</div>`;
-            } else {
-                html = `<p>${escapeHtml(message)}</p>`;
-            }
-            resultDiv.innerHTML = html;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
+        // History functions
         function saveToHistory(content, format) {
-            scanHistory.unshift({
+            const entry = {
                 content: content,
                 format: format,
-                time: new Date()
-            });
+                timestamp: new Date().toLocaleString()
+            };
             
-            // Keep only last 10 items
+            scanHistory.unshift(entry);
             if (scanHistory.length > 10) {
                 scanHistory = scanHistory.slice(0, 10);
             }
             
-            loadHistory();
+            localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
+            renderHistory();
         }
 
-        function loadHistory() {
+        function renderHistory() {
             const container = document.getElementById('history-container');
             
             if (scanHistory.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #999;">Scan a code to see it here</p>';
+                container.innerHTML = '<p class="text-muted text-center">No scan history yet</p>';
                 return;
             }
             
-            let html = '<ul class="history-list">';
-            scanHistory.forEach(item => {
-                const formatLabel = item.format ? item.format.replace('_', ' ') : 'CODE';
-                const timeStr = item.time.toLocaleTimeString();
-                html += `<li class="history-item">
-                    <span class="history-content">${escapeHtml(item.content)}</span>
-                    <span class="history-format">${formatLabel}</span>
-                    <span class="history-time">${timeStr}</span>
-                </li>`;
+            let html = '';
+            scanHistory.forEach(entry => {
+                html += `
+                    <div class="history-item d-flex justify-content-between align-items-start">
+                        <div class="history-content">${entry.content}</div>
+                        <div>
+                            <span class="history-format">${entry.format}</span>
+                            <small class="text-muted d-block">${entry.timestamp}</small>
+                        </div>
+                    </div>
+                `;
             });
-            html += '</ul>';
             
             container.innerHTML = html;
         }
 
-        // Update button text when type changes
-        document.querySelectorAll('input[name="scanType"]').forEach(input => {
-            input.addEventListener('change', function() {
-                if (selectedFile) {
-                    document.getElementById('read-btn').textContent = 'Read ' + getScanTypeLabel(this.value);
-                }
-            });
-        });
-
         // Load history on page load
+        function loadHistory() {
+            const saved = localStorage.getItem('scanHistory');
+            if (saved) {
+                try {
+                    scanHistory = JSON.parse(saved);
+                    renderHistory();
+                } catch (err) {
+                    console.error('Error loading history:', err);
+                }
+            }
+        }
+
         loadHistory();
     </script>
 </body>

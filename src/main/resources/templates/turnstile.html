@@ -3,265 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turnstile Gate Simulation</title>
+    <title>Combined Military Hospital Dhaka - Turnstile Gate</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://unpkg.com/@zxing/library@0.20.0"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px 20px;
         }
 
         .container {
-            max-width: 900px;
-            margin: 0 auto;
+            /* max-width: 700px; */
         }
 
         h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #f8fafc;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            text-align: center;
-            color: #a0a0a0;
-            margin-bottom: 30px;
+            color: #94a3b8;
             font-size: 1.1rem;
         }
 
         .card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .card h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-        }
-
-        .gate-visual {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            margin: 20px 0;
-            background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
-            border-radius: 10px;
-            border: 3px solid #ccc;
-            min-height: 200px;
-            position: relative;
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
         }
 
-        .gate-frame {
-            width: 200px;
-            height: 280px;
-            border: 8px solid #444;
-            border-radius: 10px;
+        .card-header-custom {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .card-header-custom h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-body-custom {
+            padding: 25px;
+        }
+
+        /* Time Display */
+        .time-display {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .time-display .time-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #6366f1;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .time-display .date-value {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        /* Gate Visual */
+        .gate-visual {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 16px;
+            padding: 30px 20px;
+            margin: 25px 0;
+            border: 3px solid #cbd5e1;
             position: relative;
-            background: #333;
+        }
+
+        .gate-frame {
+            width: 140px;
+            height: 200px;
+            border: 12px solid #334155;
+            border-radius: 16px;
+            margin: 0 auto;
+            position: relative;
+            background: #1e293b;
             display: flex;
             justify-content: center;
             align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 2px 10px rgba(255,255,255,0.1);
         }
 
         .gate-door {
-            width: 80px;
-            height: 240px;
-            background: linear-gradient(90deg, #666 0%, #888 50%, #666 100%);
-            border-radius: 5px;
+            width: 50px;
+            height: 170px;
+            background: linear-gradient(90deg, #64748b 0%, #94a3b8 50%, #64748b 100%);
+            border-radius: 8px;
             position: absolute;
-            transition: transform 0.5s ease-in-out;
+            left: 15px;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-origin: left center;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            box-shadow: 4px 4px 15px rgba(0,0,0,0.4);
         }
 
         .gate-door.open {
-            transform: rotateY(-80deg);
+            transform: rotateY(-100deg);
+        }
+
+        .gate-message {
+            position: absolute;
+            top: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            width: 100%;
+            text-align: center;
         }
 
         .gate-status {
             position: absolute;
-            bottom: 20px;
+            bottom: 12px;
             display: flex;
-            gap: 15px;
+            gap: 25px;
+            justify-content: center;
         }
 
         .status-light {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            border: 2px solid #333;
+            border: 3px solid #1e293b;
+            transition: all 0.3s ease;
         }
 
         .status-light.red {
-            background: #ff4444;
-            box-shadow: 0 0 10px #ff4444;
+            background: #ef4444;
+            box-shadow: 0 0 20px #ef4444, 0 0 40px rgba(239, 68, 68, 0.4);
         }
 
         .status-light.green {
-            background: #44ff44;
-            box-shadow: 0 0 10px #44ff44;
+            background: #22c55e;
+            box-shadow: 0 0 20px #22c55e, 0 0 40px rgba(34, 197, 94, 0.4);
         }
 
         .status-light.gray {
-            background: #888;
+            background: #475569;
+            box-shadow: none;
         }
 
-        .gate-message {
-            position: absolute;
-            top: 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
+        /* Upload Section */
+        .upload-section {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 25px;
             text-align: center;
-            width: 100%;
-        }
-
-        .form-group {
+            background: #f8fafc;
+            transition: all 0.3s ease;
             margin-bottom: 20px;
         }
 
-        .form-group label {
-            display: block;
+        .upload-section:hover {
+            border-color: #6366f1;
+            background: #f5f3ff;
+        }
+
+        .upload-section h3 {
+            color: #334155;
+            font-size: 1.1rem;
             margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
+        .upload-section p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .upload-section input[type="file"] {
+            max-width: 100%;
+        }
+
+        #preview-container {
+            display: none;
+            margin-top: 15px;
+        }
+
+        #preview-container img {
+            max-width: 150px;
             border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            border: 3px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-group input[type="file"] {
-            padding: 10px;
-            background: #f8f9fa;
-        }
-
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-warning {
-            background: #ffc107;
-            color: #333;
-        }
-
-        .btn-info {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
+        /* Result Box */
         .result-box {
             padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
             display: none;
+            border-left: 5px solid;
         }
 
         .result-box.success {
-            background: #d4edda;
-            border: 2px solid #28a745;
-            color: #155724;
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-left-color: #22c55e;
+            color: #166534;
         }
 
         .result-box.error {
-            background: #f8d7da;
-            border: 2px solid #dc3545;
-            color: #721c24;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left-color: #ef4444;
+            color: #991b1b;
         }
 
         .result-box.info {
-            background: #cce5ff;
-            border: 2px solid #004085;
-            color: #004085;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left-color: #3b82f6;
+            color: #1e40af;
         }
 
-        .result-box h3 {
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-        }
-
-        .result-box p {
+        /* Form Elements */
+        .form-label-custom {
+            font-weight: 600;
+            color: #334155;
             margin-bottom: 8px;
-            line-height: 1.6;
+            display: block;
         }
 
-        .result-box .highlight {
-            font-weight: bold;
-            font-size: 1.1rem;
+        .form-control-custom {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
+        .form-control-custom:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+
+        .format-hint {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+
+        .btn-secondary-custom {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success-custom {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-warning-custom {
+            background: #f59e0b;
+            color: #1e293b;
+        }
+
+        .btn-danger-custom {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-info-custom {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .button-group-custom {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Scanner */
         .scanner-container {
             display: none;
             margin-top: 20px;
@@ -273,11 +334,12 @@
 
         #video-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 350px;
             margin: 0 auto;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
-            border: 3px solid #667eea;
+            border: 4px solid #6366f1;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
         }
 
         #video-container video {
@@ -285,178 +347,167 @@
             display: block;
         }
 
+        /* Navigation */
         .nav-links {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .nav-links a {
-            color: #667eea;
+            color: #94a3b8;
             text-decoration: none;
-            margin: 0 15px;
+            margin: 0 20px;
             font-size: 1rem;
+            transition: color 0.3s ease;
         }
 
         .nav-links a:hover {
-            text-decoration: underline;
+            color: #f8fafc;
         }
 
-        .time-display {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #555;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .time-display span {
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .format-hint {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 5px;
-        }
-
+        /* Scanned Data */
         .scanned-data {
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-family: monospace;
-            font-size: 1.1rem;
+            background: rgba(255,255,255,0.7);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .scanning {
-            animation: pulse 1s infinite;
-        }
-
-        .upload-section {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .upload-section:hover {
-            border-color: #667eea;
-        }
-
-        #preview-container {
-            display: none;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        #preview-container img {
-            max-width: 200px;
-            border-radius: 5px;
-            border: 2px solid #ddd;
+        /* Divider */
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin: 25px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚪 Turnstile Gate Simulation</h1>
-        <p class="subtitle">Scan barcode to control access</p>
+        <h1 class="text-center mb-2">
+            <i class="bi bi-hospital me-2"></i>Combined Military Hospital Dhaka
+        </h1>
+        <p class="subtitle text-center mb-4">Turnstile Gate Access Control</p>
 
         <div class="card">
-            <h2>⏰ Current System Time</h2>
-            <div class="time-display">
-                Current Time: <span id="current-time">--:--</span><br>
-                Current Date: <span id="current-date">----/--/--</span>
+            <div class="card-header-custom">
+                <h2><i class="bi bi-clock me-2"></i>Current System Time</h2>
+            </div>
+            <div class="card-body-custom">
+                <div class="time-display">
+                    <div class="time-value" id="current-time">--:--:--</div>
+                    <div class="date-value" id="current-date">----/--/----</div>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <h2>🎫 Gate Access Control</h2>
-            
-            <div class="gate-visual">
-                <div class="gate-frame">
-                    <div class="gate-door" id="gate-door"></div>
-                    <div class="gate-message" id="gate-message">SCAN TICKET</div>
-                    <div class="gate-status">
-                        <div class="status-light red" id="red-light"></div>
-                        <div class="status-light green" id="green-light"></div>
+        <div class="card mt-4">
+            <div class="card-header-custom">
+                <h2><i class="bi bi-hospital me-2"></i>Gate Access Control</h2>
+            </div>
+            <div class="card-body-custom">
+                <!-- Gate Visual -->
+                <div class="gate-visual">
+                    <div class="gate-frame">
+                        <div class="gate-door" id="gate-door"></div>
+                        <div class="gate-message" id="gate-message">SCAN TICKET</div>
+                        <div class="gate-status">
+                            <div class="status-light red" id="red-light"></div>
+                            <div class="status-light green" id="green-light"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- File Upload Section -->
-            <div class="upload-section">
-                <h3>📤 Upload Barcode Image</h3>
-                <p style="color:#666; margin-bottom:15px;">Upload a barcode image containing date/time (e.g., 2024-11-23T18:30:00Z)</p>
-                <input type="file" id="barcode-file" accept="image/*" onchange="previewImage()">
-                <div id="preview-container">
-                    <img id="preview-image" alt="Barcode preview">
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <h3><i class="bi bi-upload me-2"></i>Upload Barcode Image</h3>
+                    <p>Upload a barcode image containing date/time</p>
+                    <input type="file" id="barcode-file" class="form-control form-control-custom" accept="image/*" onchange="previewImage()">
+                    <div id="preview-container">
+                        <img id="preview-image" alt="Barcode preview">
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-custom btn-primary-custom" onclick="scanAndValidate()">
+                            <i class="bi bi-upc-scan me-1"></i> Scan & Validate
+                        </button>
+                        <button class="btn btn-custom btn-secondary-custom" onclick="clearUpload()">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Clear
+                        </button>
+                    </div>
                 </div>
-                <div style="margin-top:15px;">
-                    <button class="btn btn-primary" onclick="scanAndValidate()">🔍 Scan & Validate</button>
-                    <button class="btn btn-secondary" onclick="clearUpload()">🗑️ Clear</button>
+
+                <!-- Result Box -->
+                <div class="result-box" id="result-box">
+                    <h3 id="result-title" class="mb-2"></h3>
+                    <p id="result-message" class="mb-2"></p>
+                    <div id="scanned-data-display" class="scanned-data" style="display:none;"></div>
+                    <p id="result-details" class="mb-0"></p>
                 </div>
-            </div>
 
-            <div class="result-box" id="result-box">
-                <h3 id="result-title"></h3>
-                <p id="result-message"></p>
-                <div id="scanned-data-display" class="scanned-data" style="display:none;"></div>
-                <p id="result-details"></p>
-            </div>
-
-            <div class="form-group" style="margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
-                <label for="barcode-input">Or Enter Barcode Data Manually</label>
-                <input type="text" id="barcode-input" placeholder="e.g., 2024-11-23T18:30:00Z or 2024-11-23:18:30">
-                <p class="format-hint">Format: YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DD:HH:MM</p>
-            </div>
-
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="validateBarcode()">🔓 Validate</button>
-                <button class="btn btn-secondary" onclick="clearForm()">🗑️ Clear</button>
-            </div>
-
-            <div class="button-group">
-                <button class="btn btn-success" onclick="getSampleBarcode('valid')">✅ Valid Now</button>
-                <button class="btn btn-warning" onclick="getSampleBarcode('future')">⏳ Future (30min)</button>
-                <button class="btn btn-danger" onclick="getSampleBarcode('past')">❌ Expired (30min)</button>
-                <button class="btn btn-secondary" onclick="getSampleBarcode('expired_date')">📅 Expired Date</button>
-            </div>
-
-            <div class="button-group">
-                <button class="btn btn-info" onclick="startScanner()">📷 Scan with Camera</button>
-                <button class="btn btn-secondary" onclick="stopScanner()" id="stop-scan-btn" style="display:none;">⏹️ Stop Scanner</button>
-            </div>
-
-            <div class="scanner-container" id="scanner-container">
-                <div id="video-container">
-                    <video id="video"></video>
+                <!-- Manual Input -->
+                <div class="mt-4">
+                    <label class="form-label-custom">
+                        <i class="bi bi-keyboard me-2"></i>Or Enter Barcode Manually
+                    </label>
+                    <input type="text" id="barcode-input" class="form-control form-control-custom" placeholder="e.g., 2024-11-23:18:30">
+                    <p class="format-hint">Format: YYYY-MM-DD:HH:MM</p>
                 </div>
-                <p style="text-align:center; margin-top:10px; color:#666;">Position barcode in camera view</p>
-            </div>
 
-            <div class="result-box" id="result-box">
-                <h3 id="result-title"></h3>
-                <p id="result-message"></p>
-                <div id="scanned-data-display" class="scanned-data" style="display:none;"></div>
-                <p id="result-details"></p>
+                <div class="mt-3">
+                    <button class="btn btn-custom btn-primary-custom" onclick="validateBarcode()">
+                        <i class="bi bi-check-circle me-1"></i> Validate
+                    </button>
+                    <button class="btn btn-custom btn-secondary-custom" onclick="clearForm()">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                    </button>
+                </div>
+
+                <!-- Sample Buttons -->
+                <div class="button-group-custom mt-4">
+                    <button class="btn btn-custom btn-success-custom" onclick="getSampleBarcode('valid')">
+                        <i class="bi bi-check-lg me-1"></i> Valid Now
+                    </button>
+                    <button class="btn btn-custom btn-warning-custom" onclick="getSampleBarcode('future')">
+                        <i class="bi bi-hourglass-split me-1"></i> Future (30min)
+                    </button>
+                    <button class="btn btn-custom btn-danger-custom" onclick="getSampleBarcode('past')">
+                        <i class="bi bi-x-lg me-1"></i> Expired (30min)
+                    </button>
+                    <button class="btn btn-custom btn-secondary-custom" onclick="getSampleBarcode('expired_date')">
+                        <i class="bi bi-calendar-x me-1"></i> Expired Date
+                    </button>
+                </div>
+
+                <!-- Scanner -->
+                <div class="button-group-custom">
+                    <button class="btn btn-custom btn-info-custom" onclick="startScanner()">
+                        <i class="bi bi-camera me-1"></i> Scan with Camera
+                    </button>
+                    <button class="btn btn-custom btn-secondary-custom" onclick="stopScanner()" id="stop-scan-btn" style="display:none;">
+                        <i class="bi bi-camera-video-off me-1"></i> Stop Scanner
+                    </button>
+                </div>
+
+                <div class="scanner-container" id="scanner-container">
+                    <div id="video-container">
+                        <video id="video"></video>
+                    </div>
+                    <p class="text-center text-muted mt-2 small">
+                        <i class="bi bi-info-circle me-1"></i> Position barcode in camera view
+                    </p>
+                </div>
             </div>
         </div>
 
+        <!-- Navigation -->
         <div class="nav-links">
-            <a href="/">🏠 Home</a>
-            <a href="/reader">📱 QR Reader</a>
+            <a href="/home"><i class="bi bi-house me-1"></i>Home</a>
+            <a href="/reader-page"><i class="bi bi-qr-code me-1"></i>QR Reader</a>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let codeReader = null;
         let videoStream = null;
@@ -472,7 +523,7 @@
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
-            document.getElementById('current-date').textContent = `${year}-${month}-${day}`;
+            document.getElementById('current-date').textContent = `${year}/${month}/${day}`;
         }
 
         setInterval(updateTime, 1000);
@@ -496,7 +547,30 @@
 
         // Clear upload
         function clearUpload() {
-            resetFileInput();
+            // Clear file input
+            const fileInput = document.getElementById('barcode-file');
+            fileInput.value = '';
+            const newFileInput = fileInput.cloneNode(false);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+            document.getElementById('preview-container').style.display = 'none';
+            document.getElementById('preview-image').src = '';
+            
+            // Clear result panel
+            document.getElementById('result-box').style.display = 'none';
+            
+            // Reset gate
+            const gateDoor = document.getElementById('gate-door');
+            const gateMessage = document.getElementById('gate-message');
+            const redLight = document.getElementById('red-light');
+            const greenLight = document.getElementById('green-light');
+            
+            gateDoor.classList.remove('open');
+            gateMessage.textContent = 'SCAN TICKET';
+            gateMessage.style.color = '#f1f5f9';
+            greenLight.classList.remove('green');
+            greenLight.classList.add('gray');
+            redLight.classList.remove('red');
+            redLight.classList.add('gray');
         }
 
         // Scan and validate from file upload
@@ -599,7 +673,7 @@
                 // Visual feedback
                 gateDoor.classList.add('open');
                 gateMessage.textContent = 'OPEN';
-                gateMessage.style.color = '#28a745';
+                gateMessage.style.color = '#22c55e';
                 redLight.classList.remove('red');
                 redLight.classList.add('gray');
                 greenLight.classList.remove('gray');
@@ -630,7 +704,7 @@
                 // Visual feedback
                 gateDoor.classList.remove('open');
                 gateMessage.textContent = 'CLOSED';
-                gateMessage.style.color = '#dc3545';
+                gateMessage.style.color = '#ef4444';
                 greenLight.classList.remove('green');
                 greenLight.classList.add('gray');
                 redLight.classList.remove('gray');
@@ -668,7 +742,7 @@
             
             gateDoor.classList.remove('open');
             gateMessage.textContent = 'SCAN TICKET';
-            gateMessage.style.color = '#333';
+            gateMessage.style.color = '#f1f5f9';
             greenLight.classList.remove('green');
             greenLight.classList.add('gray');
             redLight.classList.remove('red');
